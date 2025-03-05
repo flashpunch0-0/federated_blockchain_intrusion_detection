@@ -29,4 +29,4 @@ class FLClient(fl.client.NumPyClient):
         loss, accuracy = self.model.evaluate(X_test, Y_test, verbose=0)
         return loss, len(X_test), {"accuracy": accuracy}
 
-fl.client.start_numpy_client(server_address="127.0.0.1:8080", client=FLClient())
+fl.client.start_numpy_client(server_address="127.0.0.1:8082", client=FLClient())
