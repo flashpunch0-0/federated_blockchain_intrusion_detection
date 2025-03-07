@@ -11,7 +11,7 @@ NUM_CLIENTS = 3  # Total number of clients
 
 #  connect to blockchain
 w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-contract_address = "0x876686Df6F9305748a78cc301caE460C730B1376"
+contract_address = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"
 # private_key = os.getenv("0x30876c346fc0a479ec7a4cef831473a1a27977924fc1c85e68bfd19533a42318")
 
 contract_abi =  [
@@ -155,17 +155,40 @@ contract_abi =  [
   ] # Replace with actual ABI
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-def fetch_model_from_blockchain():
-    """Fetches the global model from blockchain and converts it back to weights."""
-    try:
-        model_json = contract.functions.getModel().call()
-        model_weights = np.array(json.loads(model_json), dtype=object)
-        print("✅ Model fetched from blockchain!")
-        return model_weights
-    except Exception as e:
-        print("⚠️ No model found on blockchain. Using random initialization.")
-        return None
+# def fetch_model_from_blockchain():
+#     """Fetches the global model from blockchain and converts it back to weights."""
+#     try:
+#         model_json = contract.functions.getModel().call()
+#         model_weights = np.array(json.loads(model_json), dtype=object)
+#         print("✅ Model fetched from blockchain!")
+#         return model_weights
+#     except Exception as e:
+#         print("⚠️ No model found on blockchain. Using random initialization.")
+#         return None
     
+def fetch_model_from_blockchain():
+    """Fetches the latest global model from the blockchain and converts it back to weights."""
+    try:
+        # Get the latest stored round
+        latest_round = contract.functions.latestRound().call()
+
+        if latest_round == 0:
+            print("⚠️ No model found on blockchain. Using random initialization.")
+            return None
+
+        # Fetch model weights from the latest round
+        model_json = contract.functions.getModel(latest_round).call()
+        model_weights = np.array(json.loads(model_json), dtype=object)
+
+        print(f"✅ Model fetched from blockchain! Round: {latest_round}")
+        print("🔹 Initial Model Weights:", model_weights)  # Print weights
+
+        return model_weights
+
+    except Exception as e:
+        print(f"⚠️ Error fetching model from blockchain: {e}")
+        return None
+
 
 # Load unique dataset for this client
 X_train, Y_train, X_test, Y_test = get_client_data(CLIENT_ID, NUM_CLIENTS)
@@ -173,9 +196,13 @@ X_train, Y_train, X_test, Y_test = get_client_data(CLIENT_ID, NUM_CLIENTS)
 class FLClient(fl.client.NumPyClient):
     def __init__(self):
         self.model = get_model(sample_shape=(X_train.shape[1],))
-        initial_weights = fetch_model_from_blockchain()
-        if initial_weights is not None:
-            self.model.set_weights(initial_weights)
+        print(self.model.summary())
+        # initial_weights = fetch_model_from_blockchain()
+        # if initial_weights is not None:
+        #   self.model.set_weights(initial_weights)
+        #   print("✅ Model weights loaded successfully!")
+        # else:
+        #   print("⚠️ No model on blockchain. Using randomly initialized weights.")
 
     def get_parameters(self, config):
         return self.model.get_weights()
