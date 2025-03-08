@@ -160,8 +160,8 @@ import json
 
 # Connect to Blockchain
 w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-contract_address = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"
-private_key = "0xf2ead51fea5d3821860d4d87f93689cc064c6e804644a894db5cfbf8eb1ed4d6"
+contract_address = "0x568B4f8D887D84Af68877521C4EcB023405C0d3F"
+private_key = "0xebf69d7750e763b3aa3b80f96ef58bf29b93067b1f95e719b6c5691fd8b0f7fa"
 account = w3.eth.account.from_key(private_key)
 
 # Smart Contract ABI (Updated for Round Tracking)
@@ -179,15 +179,22 @@ contract_abi = [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "indexed": False,
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "name": "ModelStored",
+      "type": "event"
+    },
+    {
+      "anonymous": False,
+      "inputs": [
+        {
+          "indexed": False,
+          "internalType": "uint256",
+          "name": "round",
+          "type": "uint256"
+        }
+      ],
+      "name": "ModelUpdated",
       "type": "event"
     },
     {
@@ -227,9 +234,9 @@ contract_abi = [
       "name": "getModel",
       "outputs": [
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "",
-          "type": "string"
+          "type": "bytes[]"
         }
       ],
       "stateMutability": "view",
@@ -262,11 +269,6 @@ contract_abi = [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -293,9 +295,9 @@ contract_abi = [
           "type": "uint256"
         },
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "weights",
-          "type": "string"
+          "type": "bytes[]"
         }
       ],
       "name": "storeModel",

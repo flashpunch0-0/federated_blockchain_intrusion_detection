@@ -11,7 +11,7 @@ NUM_CLIENTS = 3  # Total number of clients
 
 #  connect to blockchain
 w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-contract_address = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"
+contract_address = "0x568B4f8D887D84Af68877521C4EcB023405C0d3F"
 # private_key = os.getenv("0x30876c346fc0a479ec7a4cef831473a1a27977924fc1c85e68bfd19533a42318")
 
 contract_abi =  [
@@ -28,15 +28,22 @@ contract_abi =  [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "indexed": False,
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "name": "ModelStored",
+      "type": "event"
+    },
+    {
+      "anonymous": False,
+      "inputs": [
+        {
+          "indexed": False,
+          "internalType": "uint256",
+          "name": "round",
+          "type": "uint256"
+        }
+      ],
+      "name": "ModelUpdated",
       "type": "event"
     },
     {
@@ -76,9 +83,9 @@ contract_abi =  [
       "name": "getModel",
       "outputs": [
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "",
-          "type": "string"
+          "type": "bytes[]"
         }
       ],
       "stateMutability": "view",
@@ -111,11 +118,6 @@ contract_abi =  [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -142,9 +144,9 @@ contract_abi =  [
           "type": "uint256"
         },
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "weights",
-          "type": "string"
+          "type": "bytes[]"
         }
       ],
       "name": "storeModel",
@@ -152,7 +154,7 @@ contract_abi =  [
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ] # Replace with actual ABI
+  ]
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
 # def fetch_model_from_blockchain():

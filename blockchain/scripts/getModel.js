@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 
 async function main() {
   const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545"); // Ganache RPC
-  const contractAddress = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"; // Replace with actual address
+  const contractAddress = "0x568B4f8D887D84Af68877521C4EcB023405C0d3F"; // Replace with actual address
   const abi = [
     {
       inputs: [],
@@ -18,14 +18,21 @@ async function main() {
           name: "round",
           type: "uint256",
         },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "weights",
-          type: "string",
-        },
       ],
       name: "ModelStored",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "round",
+          type: "uint256",
+        },
+      ],
+      name: "ModelUpdated",
       type: "event",
     },
     {
@@ -65,9 +72,9 @@ async function main() {
       name: "getModel",
       outputs: [
         {
-          internalType: "string",
+          internalType: "bytes[]",
           name: "",
-          type: "string",
+          type: "bytes[]",
         },
       ],
       stateMutability: "view",
@@ -101,11 +108,6 @@ async function main() {
           name: "round",
           type: "uint256",
         },
-        {
-          internalType: "string",
-          name: "weights",
-          type: "string",
-        },
       ],
       stateMutability: "view",
       type: "function",
@@ -131,9 +133,9 @@ async function main() {
           type: "uint256",
         },
         {
-          internalType: "string",
+          internalType: "bytes[]",
           name: "weights",
-          type: "string",
+          type: "bytes[]",
         },
       ],
       name: "storeModel",
