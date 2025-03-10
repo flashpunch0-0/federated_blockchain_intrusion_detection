@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 
 async function main() {
   const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545"); // Ganache RPC
-  const contractAddress = "0x568B4f8D887D84Af68877521C4EcB023405C0d3F"; // Replace with actual address
+  const contractAddress = "0x9eD857B7d462D12F49516875bFBDD0Db48193895"; // Replace with actual address
   const abi = [
     {
       inputs: [],
@@ -82,6 +82,19 @@ async function main() {
     },
     {
       inputs: [],
+      name: "getOwner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
       name: "latestRound",
       outputs: [
         {
@@ -149,8 +162,9 @@ async function main() {
   const contract = new ethers.Contract(contractAddress, abi, provider);
 
   // Fetch the stored model for round 5
-  const storedModel = await contract.getModel(5);
-  console.log("Stored Model Weights for Round 5:", storedModel);
+  // const storedModel = await contract.getModel(5);
+  // console.log("Stored Model Weights for Round 5:", storedModel);
+  console.log(await contract.getOwner());
 }
 
 main()

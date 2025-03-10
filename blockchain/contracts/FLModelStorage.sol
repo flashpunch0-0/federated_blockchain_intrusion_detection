@@ -134,4 +134,9 @@ contract FLModelStorage {
         owner = newOwner;
         emit OwnerChanged(newOwner);
     }
+
+    function getOwner() public view returns (address) {
+    return owner;
+}
+
 }
