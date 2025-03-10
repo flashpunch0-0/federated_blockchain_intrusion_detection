@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 
 async function main() {
   const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545"); // Ganache RPC
-  const contractAddress = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"; // Replace with actual address
+  const contractAddress = "0x9eD857B7d462D12F49516875bFBDD0Db48193895"; // Replace with actual address
   const abi = [
     {
       inputs: [],
@@ -18,14 +18,21 @@ async function main() {
           name: "round",
           type: "uint256",
         },
-        {
-          indexed: false,
-          internalType: "string",
-          name: "weights",
-          type: "string",
-        },
       ],
       name: "ModelStored",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "round",
+          type: "uint256",
+        },
+      ],
+      name: "ModelUpdated",
       type: "event",
     },
     {
@@ -65,9 +72,22 @@ async function main() {
       name: "getModel",
       outputs: [
         {
-          internalType: "string",
+          internalType: "bytes[]",
           name: "",
-          type: "string",
+          type: "bytes[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getOwner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
         },
       ],
       stateMutability: "view",
@@ -101,11 +121,6 @@ async function main() {
           name: "round",
           type: "uint256",
         },
-        {
-          internalType: "string",
-          name: "weights",
-          type: "string",
-        },
       ],
       stateMutability: "view",
       type: "function",
@@ -131,9 +146,9 @@ async function main() {
           type: "uint256",
         },
         {
-          internalType: "string",
+          internalType: "bytes[]",
           name: "weights",
-          type: "string",
+          type: "bytes[]",
         },
       ],
       name: "storeModel",
@@ -147,8 +162,9 @@ async function main() {
   const contract = new ethers.Contract(contractAddress, abi, provider);
 
   // Fetch the stored model for round 5
-  const storedModel = await contract.getModel(5);
-  console.log("Stored Model Weights for Round 5:", storedModel);
+  // const storedModel = await contract.getModel(5);
+  // console.log("Stored Model Weights for Round 5:", storedModel);
+  console.log(await contract.getOwner());
 }
 
 main()

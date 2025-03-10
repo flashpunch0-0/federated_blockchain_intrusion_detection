@@ -11,7 +11,7 @@ NUM_CLIENTS = 3  # Total number of clients
 
 #  connect to blockchain
 w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-contract_address = "0x5e2501E40E87489F6c682d599890B5c9D20eF62a"
+contract_address = "0x9eD857B7d462D12F49516875bFBDD0Db48193895"
 # private_key = os.getenv("0x30876c346fc0a479ec7a4cef831473a1a27977924fc1c85e68bfd19533a42318")
 
 contract_abi =  [
@@ -28,15 +28,22 @@ contract_abi =  [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "indexed": False,
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "name": "ModelStored",
+      "type": "event"
+    },
+    {
+      "anonymous": False,
+      "inputs": [
+        {
+          "indexed": False,
+          "internalType": "uint256",
+          "name": "round",
+          "type": "uint256"
+        }
+      ],
+      "name": "ModelUpdated",
       "type": "event"
     },
     {
@@ -76,9 +83,22 @@ contract_abi =  [
       "name": "getModel",
       "outputs": [
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "",
-          "type": "string"
+          "type": "bytes[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -111,11 +131,6 @@ contract_abi =  [
           "internalType": "uint256",
           "name": "round",
           "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "weights",
-          "type": "string"
         }
       ],
       "stateMutability": "view",
@@ -142,9 +157,9 @@ contract_abi =  [
           "type": "uint256"
         },
         {
-          "internalType": "string",
+          "internalType": "bytes[]",
           "name": "weights",
-          "type": "string"
+          "type": "bytes[]"
         }
       ],
       "name": "storeModel",
@@ -152,7 +167,7 @@ contract_abi =  [
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ] # Replace with actual ABI
+  ]
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
 # def fetch_model_from_blockchain():
@@ -194,7 +209,7 @@ def fetch_model_from_blockchain():
 X_train, Y_train, X_test, Y_test = get_client_data(CLIENT_ID, NUM_CLIENTS)
 
 class FLClient(fl.client.NumPyClient):
-    def __init__(self):
+    def __init__(self,round_number=1):
         self.model = get_model(sample_shape=(X_train.shape[1],))
         print(self.model.summary())
         # initial_weights = fetch_model_from_blockchain()
@@ -203,6 +218,26 @@ class FLClient(fl.client.NumPyClient):
         #   print("✅ Model weights loaded successfully!")
         # else:
         #   print("⚠️ No model on blockchain. Using randomly initialized weights.")
+        self.fetch_model_from_blockchain(round_number)
+        
+    def fetch_model_from_blockchain(self, round_number):
+        """Retrieve stored model weights from the blockchain and load them into the model."""
+        try:
+            stored_weights = contract.functions.getModel(round_number).call()
+
+            if stored_weights:
+                # Convert weights from bytes to NumPy arrays
+                retrieved_weights = [np.frombuffer(w, dtype=np.float64) for w in stored_weights]
+
+                # Load the weights into the model
+                self.model.set_weights(retrieved_weights)
+
+                print(f"✅ Model weights for round {round_number} loaded from blockchain!")
+            else:
+                print(f"⚠️ No model found on blockchain for round {round_number}")
+
+        except Exception as e:
+            print(f"❌ Error fetching model from blockchain: {str(e)}")
 
     def get_parameters(self, config):
         return self.model.get_weights()
